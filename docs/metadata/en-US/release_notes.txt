@@ -1,0 +1,1 @@
+First release: generate App Store and Google Play screenshots and app preview videos, all on your device.

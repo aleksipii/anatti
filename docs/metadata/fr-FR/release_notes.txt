@@ -1,0 +1,1 @@
+Première version : générez des captures d’écran et des vidéos de présentation pour l’App Store et Google Play, le tout sur votre appareil.

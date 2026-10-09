@@ -1,0 +1,23 @@
+Anatti turns your app's screens into store-ready screenshots and app preview videos, sized correctly for the App Store and Google Play. Everything happens on your iPhone or iPad.
+
+WHAT YOU CAN DO
+• Build screenshots at every size the App Store and Google Play require
+• Create app preview videos that follow store rules for length, format and resolution
+• Add captions and backgrounds, and organize your work in projects
+• Use the app in 7 languages: English, Spanish, German, Finnish, Swedish, French and Italian
+
+PRIVATE BY DESIGN
+Anatti works entirely on your device. There are no accounts, no servers and no analytics. The screenshots you choose never leave your phone.
+
+ANATTI PRO
+Exporting requires Anatti Pro, a monthly auto-renewing subscription.
+
+SUBSCRIPTION DETAILS
+• Anatti Pro costs 7.99 EUR per month (price may vary by country).
+• Payment is charged to your Apple Account at confirmation of purchase.
+• The subscription renews automatically every month unless it is cancelled at least 24 hours before the end of the current period.
+• Your account is charged for renewal within 24 hours before the end of the current period.
+• You can manage or cancel your subscription at any time in your Apple Account settings after purchase.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://anatti.fi/privacy

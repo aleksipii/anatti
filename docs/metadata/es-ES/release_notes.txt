@@ -1,0 +1,1 @@
+Primera versión: genera capturas y vídeos de vista previa para App Store y Google Play, todo en tu dispositivo.

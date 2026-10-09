@@ -42,3 +42,16 @@ Use these exact keys in code via `String(localized:)` / `Text("key")`.
 | paywall.thanks | Thank you! Anatti Pro is active. |
 | export.locked | Export requires Anatti Pro |
 | export.unlock | Unlock Pro |
+
+## Keys requested by Skeleton
+| Key | English source |
+|---|---|
+| project.name.placeholder | Project name |
+| project.create | Create |
+| project.delete | Delete |
+| project.created | Created %@ |
+| common.cancel | Cancel |
+| settings.pro.active | Active |
+| settings.pro.inactive | Not subscribed |
+| settings.section.subscription | Subscription |
+| settings.section.privacy | Privacy |

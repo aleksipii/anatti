@@ -1,0 +1,1 @@
+Erste Version: Erzeuge Screenshots und App-Vorschauvideos für App Store und Google Play, alles auf deinem Gerät.

@@ -1,0 +1,77 @@
+{
+  "identifier": "A7A71C00",
+  "nonRenewingSubscriptions": [],
+  "products": [],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "fi_FI",
+    "_storefront": "FIN",
+    "_storeKitErrors": [],
+    "_askToBuyEnabled": false
+  },
+  "subscriptionGroups": [
+    {
+      "id": "21480001",
+      "localizations": [],
+      "name": "anatti_pro",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "7.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "6740000001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Monthly access to all Anatti Pro features.",
+              "displayName": "Anatti Pro",
+              "locale": "en_US"
+            },
+            {
+              "description": "Acceso mensual a todas las funciones de Anatti Pro.",
+              "displayName": "Anatti Pro",
+              "locale": "es_ES"
+            },
+            {
+              "description": "Monatlicher Zugang zu allen Funktionen von Anatti Pro.",
+              "displayName": "Anatti Pro",
+              "locale": "de_DE"
+            },
+            {
+              "description": "Kuukausitilaus kaikkiin Anatti Pro -ominaisuuksiin.",
+              "displayName": "Anatti Pro",
+              "locale": "fi_FI"
+            },
+            {
+              "description": "Månadsvis tillgång till alla funktioner i Anatti Pro.",
+              "displayName": "Anatti Pro",
+              "locale": "sv_SE"
+            },
+            {
+              "description": "Accès mensuel à toutes les fonctionnalités d'Anatti Pro.",
+              "displayName": "Anatti Pro",
+              "locale": "fr_FR"
+            },
+            {
+              "description": "Accesso mensile a tutte le funzioni di Anatti Pro.",
+              "displayName": "Anatti Pro",
+              "locale": "it_IT"
+            }
+          ],
+          "productID": "fi.anatti.pro.monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Anatti Pro Monthly",
+          "subscriptionGroupID": "21480001",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
+        }
+      ]
+    }
+  ],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}

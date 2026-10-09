@@ -1,0 +1,150 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "App display name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryUsageDescription": {
+      "comment": "Photo library read permission prompt.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti reads the screenshots you choose to build store images. Nothing leaves your device."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti lee las capturas que eliges para crear imágenes para las tiendas. Nada sale de tu dispositivo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti liest die Screenshots, die du auswählst, um Store-Bilder zu erstellen. Nichts verlässt dein Gerät."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti lukee valitsemasi kuvakaappaukset kauppakuvien luomiseksi. Mikään ei poistu laitteeltasi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti läser de skärmbilder du väljer för att skapa butiksbilder. Ingenting lämnar din enhet."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti lit les captures d’écran que vous choisissez pour créer des visuels pour les stores. Rien ne quitte votre appareil."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti legge gli screenshot che scegli per creare le immagini per gli store. Nulla lascia il tuo dispositivo."
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryAddUsageDescription": {
+      "comment": "Photo library add-only permission prompt.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti saves the finished screenshots and videos you export to your photo library."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti guarda en tu fototeca las capturas y los vídeos terminados que exportas."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti sichert die fertigen Screenshots und Videos, die du exportierst, in deiner Fotomediathek."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti tallentaa viemäsi valmiit kuvakaappaukset ja videot kuvakirjastoosi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti sparar de färdiga skärmbilder och videor du exporterar i ditt bildbibliotek."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti enregistre dans votre photothèque les captures d’écran et les vidéos terminées que vous exportez."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anatti salva nella tua libreria foto gli screenshot e i video finiti che esporti."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
