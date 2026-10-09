@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AnattiPro
 
 @main
 struct AnattiApp: App {

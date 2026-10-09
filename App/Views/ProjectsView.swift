@@ -20,7 +20,7 @@ struct ProjectsView: View {
                         ForEach(projects) { project in
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(project.name).font(.headline)
-                                Text("project.created \(project.createdAt.formatted(date: .abbreviated, time: .omitted))")
+                                Text(String(format: String(localized: "project.created"), project.createdAt.formatted(date: .abbreviated, time: .omitted)))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }

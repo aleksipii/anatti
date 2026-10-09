@@ -17,5 +17,5 @@ See `docs/` for the plan (`DESIGN.md`), store size specs (`SPECS.md`) and the sh
 4. Run the `Anatti` scheme. It uses `Configuration/Anatti.storekit` as its StoreKit configuration, so the subscription can be tested in the simulator.
 
 ## Tests
-- `swift test` runs the AnattiCore (and AnattiPro) package tests.
+- `swift test` runs the AnattiCore and AnattiPro package tests (macOS only: AnattiPro imports SwiftUI/StoreKit, so it will not build on Linux).
 - App tests (`AnattiTests`) run from Xcode with the `Anatti` scheme.

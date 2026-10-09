@@ -14,7 +14,7 @@ struct SettingsView: View {
                     HStack {
                         Text("settings.pro")
                         Spacer()
-                        Text(subscription.isPro ? "settings.pro.active" : "settings.pro.inactive")
+                        Text(LocalizedStringKey(subscription.isPro ? "settings.pro.active" : "settings.pro.inactive"))
                             .foregroundStyle(.secondary)
                     }
                     if !subscription.isPro {
