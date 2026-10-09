@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(SubscriptionManager.self) private var subscription
     @State private var showingPaywall = false
     @State private var showingManage = false
+    @State private var restoreMessage: LocalizedStringKey?
 
     var body: some View {
         NavigationStack {
@@ -21,7 +22,10 @@ struct SettingsView: View {
                         Button("export.unlock") { showingPaywall = true }
                     }
                     Button("settings.restore") {
-                        Task { await ProBridge.restorePurchases() }
+                        Task {
+                            await ProBridge.restorePurchases()
+                            restoreMessage = subscription.isPro ? "paywall.thanks" : "settings.restore.none"
+                        }
                     }
                     Button("settings.manage") { showingManage = true }
                 }
@@ -33,6 +37,13 @@ struct SettingsView: View {
             .navigationTitle("tab.settings")
             .paywallSheet(isPresented: $showingPaywall)
             .manageSubscriptionsSheet(isPresented: $showingManage)
+            .alert("settings.restore", isPresented: Binding(
+                get: { restoreMessage != nil },
+                set: { if !$0 { restoreMessage = nil } })) {
+                Button("common.done", role: .cancel) {}
+            } message: {
+                if let restoreMessage { Text(restoreMessage) }
+            }
         }
     }
 }

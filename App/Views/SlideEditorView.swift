@@ -82,10 +82,14 @@ struct SlideEditorView: View {
         let size = target.size
         return GeometryReader { geo in
             let scale = min(geo.size.width / CGFloat(size.width), geo.size.height / CGFloat(size.height))
+            // scaleEffect does not change layout size, so the full-size canvas is pinned to the
+            // top-left of a frame of the scaled size; otherwise it would be centered and drawn off screen.
             canvas(size: size)
                 .frame(width: CGFloat(size.width), height: CGFloat(size.height))
                 .scaleEffect(scale, anchor: .topLeading)
-                .frame(width: CGFloat(size.width) * scale, height: CGFloat(size.height) * scale)
+                .frame(width: CGFloat(size.width) * scale, height: CGFloat(size.height) * scale,
+                       alignment: .topLeading)
+                .clipped()
                 .frame(width: geo.size.width, height: geo.size.height)
         }
         .frame(height: 420)
