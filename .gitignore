@@ -1,0 +1,4 @@
+.build/
+Anatti.xcodeproj/
+xcuserdata/
+.DS_Store
