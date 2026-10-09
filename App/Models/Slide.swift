@@ -46,11 +46,19 @@ extension ModelContext {
         delete(slide)
     }
 
+    /// Deletes a source video and its stored file.
+    func deleteVideo(_ asset: SourceAsset, store: LocalFileStore = .shared) {
+        try? store.delete(asset.filename)
+        delete(asset)
+    }
+
     /// Deletes a project together with its slides and their files.
     func deleteProject(_ project: Project, store: LocalFileStore = .shared) {
         let id = project.id
         let descriptor = FetchDescriptor<Slide>(predicate: #Predicate { $0.projectID == id })
         for slide in (try? fetch(descriptor)) ?? [] { deleteSlide(slide, store: store) }
+        let assetDescriptor = FetchDescriptor<SourceAsset>(predicate: #Predicate { $0.projectID == id })
+        for asset in (try? fetch(assetDescriptor)) ?? [] { deleteVideo(asset, store: store) }
         if let icon = project.appIconFilename { try? store.delete(icon) }
         delete(project)
     }

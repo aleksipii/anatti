@@ -28,4 +28,25 @@ import AnattiCore
             #expect(Int(image.size.height * image.scale) == parts[1], "\(path)")
         }
     }
+
+    @Test func exportsConvertedVideo() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("store-\(UUID().uuidString)")
+        let store = LocalFileStore(directory: directory)
+        let source = try await TestVideo.make(seconds: 4, fps: 30)
+        let name = try store.importFile(at: source)
+        defer { try? FileManager.default.removeItem(at: directory); try? FileManager.default.removeItem(at: source) }
+
+        let project = Project(name: "Video")
+        let asset = SourceAsset(projectID: project.id, filename: name, kind: .video)
+        let target = try #require(VideoTarget.all.first { $0.size == PixelSize(886, 1920) })
+
+        let result = try await ExportService.export(project: project, slides: [], targets: [],
+                                                    videos: [asset], videoTargets: [target], store: store)
+        defer { try? FileManager.default.removeItem(at: result.folder) }
+
+        #expect(result.written == 1 && result.skipped == 0)
+        let file = result.folder.appendingPathComponent("AppStore/Previews/886x1920/01.mp4")
+        let measured = try await VideoConverter.measure(file)
+        #expect(measured.size == PixelSize(886, 1920) && measured.hasAudio && measured.isH264)
+    }
 }

@@ -1,15 +1,21 @@
 import SwiftUI
 import SwiftData
+import PhotosUI
+import AVFoundation
 
 struct ProjectDetailView: View {
     @Bindable var project: Project
     @Environment(\.modelContext) private var modelContext
     @Query private var slides: [Slide]
+    @Query private var assets: [SourceAsset]
+    @State private var videoItem: PhotosPickerItem?
+    @State private var importFailed = false
 
     init(project: Project) {
         self.project = project
         let id = project.id
         _slides = Query(filter: #Predicate<Slide> { $0.projectID == id }, sort: \Slide.order)
+        _assets = Query(filter: #Predicate<SourceAsset> { $0.projectID == id }, sort: \SourceAsset.createdAt)
     }
 
     var body: some View {
@@ -43,6 +49,28 @@ struct ProjectDetailView: View {
                     }
                 }
             }
+
+            Section("project.videos") {
+                if videos.isEmpty {
+                    Text("video.empty").foregroundStyle(.secondary)
+                }
+                ForEach(Array(videos.enumerated()), id: \.element.id) { index, asset in
+                    VideoRow(number: index + 1, asset: asset)
+                }
+                .onDelete { offsets in
+                    for index in offsets { modelContext.deleteVideo(videos[index]) }
+                }
+                PhotosPicker(selection: $videoItem, matching: .videos) {
+                    Label("video.add", systemImage: "video.badge.plus")
+                }
+                if importFailed {
+                    Label("video.import.failed", systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+                }
+            }
+        }
+        .onChange(of: videoItem) { _, item in
+            guard let item else { return }
+            Task { await importVideo(from: item) }
         }
         .navigationTitle(project.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -60,5 +88,52 @@ struct ProjectDetailView: View {
             get: { Color(hex: project[keyPath: keyPath]) },
             set: { project[keyPath: keyPath] = $0.hexString }
         )
+    }
+
+    private var videos: [SourceAsset] { assets.filter { $0.kind == .video } }
+
+    private func importVideo(from item: PhotosPickerItem) async {
+        defer { videoItem = nil }
+        importFailed = false
+        guard let picked = try? await item.loadTransferable(type: PickedVideo.self) else {
+            importFailed = true
+            return
+        }
+        modelContext.insert(SourceAsset(projectID: project.id, filename: picked.filename, kind: .video))
+    }
+}
+
+/// A picked video, already copied into LocalFileStore.
+private struct PickedVideo: Transferable {
+    let filename: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(contentType: .movie) { _ in
+            throw CocoaError(.featureUnsupported)   // import only
+        } importing: { received in
+            PickedVideo(filename: try LocalFileStore.shared.importFile(at: received.file))
+        }
+    }
+}
+
+private struct VideoRow: View {
+    let number: Int
+    let asset: SourceAsset
+    @State private var seconds: Double?
+
+    var body: some View {
+        HStack {
+            Label(String(format: String(localized: "video.row"), number), systemImage: "film")
+            Spacer()
+            if let seconds {
+                Text(Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond)))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+        }
+        .task {
+            let info = try? await VideoConverter.inspect(LocalFileStore.shared.url(for: asset.filename))
+            seconds = info?.durationSeconds
+        }
     }
 }

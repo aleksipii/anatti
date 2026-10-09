@@ -63,6 +63,8 @@ private struct ExportFlowView: View {
 private struct ExportOptionsView: View {
     let project: Project
     @Query private var slides: [Slide]
+    @Query private var assets: [SourceAsset]
+    @State private var selectedVideoSizes: Set<PixelSize> = []
     @State private var selected: Set<PixelSize> = Set(ScreenshotTarget.all.filter(\.isRequired).map(\.size))
     @State private var progress = 0.0
     @State private var isExporting = false
@@ -75,18 +77,30 @@ private struct ExportOptionsView: View {
         self.project = project
         let id = project.id
         _slides = Query(filter: #Predicate<Slide> { $0.projectID == id }, sort: \Slide.order)
+        _assets = Query(filter: #Predicate<SourceAsset> { $0.projectID == id }, sort: \SourceAsset.createdAt)
     }
 
     private var targets: [ScreenshotTarget] { ScreenshotTarget.all.filter { selected.contains($0.size) } }
 
+    private var videos: [SourceAsset] { assets.filter { $0.kind == .video } }
+    private var videoTargets: [VideoTarget] { VideoTarget.all.filter { selectedVideoSizes.contains($0.size) } }
+
     private var warnings: [ExportWarning] {
-        ExportPlanner.warnings(slideCount: slides.count, specs: targets.flatMap(\.specs))
+        slides.isEmpty ? [] : ExportPlanner.warnings(slideCount: slides.count, specs: targets.flatMap(\.specs))
+    }
+
+    private var videoWarnings: [ExportWarning] {
+        videos.isEmpty ? [] : ExportPlanner.warnings(slideCount: videos.count, specs: videoTargets.flatMap(\.specs))
+    }
+
+    private var hasWork: Bool {
+        (!slides.isEmpty && !targets.isEmpty) || (!videos.isEmpty && !videoTargets.isEmpty)
     }
 
     var body: some View {
         List {
-            if slides.isEmpty {
-                Section { Text("export.noslides").foregroundStyle(.secondary) }
+            if slides.isEmpty && videos.isEmpty {
+                Section { Text("export.nocontent").foregroundStyle(.secondary) }
             }
 
             Section("export.sizes") {
@@ -101,11 +115,31 @@ private struct ExportOptionsView: View {
                 }
             }
 
-            if !slides.isEmpty && !warnings.isEmpty {
+            if !videos.isEmpty {
+                Section("export.videos") {
+                    ForEach(VideoTarget.all) { target in
+                        Toggle(target.size.label, isOn: Binding(
+                            get: { selectedVideoSizes.contains(target.size) },
+                            set: { on in
+                                if on { selectedVideoSizes.insert(target.size) } else { selectedVideoSizes.remove(target.size) }
+                                result = nil
+                            }))
+                    }
+                }
+            }
+
+            if !warnings.isEmpty || !videoWarnings.isEmpty {
                 Section {
                     ForEach(warnings, id: \.self) { warning in
                         Label(text(for: warning), systemImage: "exclamationmark.triangle.fill")
                             .foregroundStyle(.orange)
+                    }
+                    ForEach(videoWarnings, id: \.self) { warning in
+                        if case .tooMany(let max, let have) = warning {
+                            Label(String(format: String(localized: "export.warn.videos"), max, have),
+                                  systemImage: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                        }
                     }
                 }
             }
@@ -114,7 +148,7 @@ private struct ExportOptionsView: View {
                 Button(action: startExport) {
                     Label("export.start", systemImage: "square.and.arrow.up")
                 }
-                .disabled(slides.isEmpty || targets.isEmpty || isExporting)
+                .disabled(!hasWork || isExporting)
 
                 if isExporting {
                     ProgressView(value: progress)
@@ -167,7 +201,8 @@ private struct ExportOptionsView: View {
         Task {
             do {
                 result = try await ExportService.export(
-                    project: project, slides: slides, targets: targets,
+                    project: project, slides: slides, targets: slides.isEmpty ? [] : targets,
+                    videos: videos, videoTargets: videoTargets,
                     progress: { progress = $0 })
             } catch {
                 failed = true
