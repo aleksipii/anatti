@@ -4316,6 +4316,100 @@
           }
         }
       }
+    },
+    "export.ppo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Product Page Optimization"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optimización de la página de producto"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Produktseitenoptimierung"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuotesivun optimointi (PPO)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Produktsideoptimering"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optimisation de la page produit"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottimizzazione pagina prodotto"
+          }
+        }
+      }
+    },
+    "export.ppo.note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Images for App Store product page tests. Each test uses one image per size; upload the one you want to try."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imágenes para las pruebas de la página de producto de App Store. Cada prueba usa una imagen por tamaño; sube la que quieras probar."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilder für App-Store-Produktseitentests. Jeder Test nutzt ein Bild pro Größe; lade das Bild hoch, das du testen möchtest."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuvia App Storen tuotesivutesteihin. Jokainen testi käyttää yhtä kuvaa kokoa kohti; lataa se, jota haluat kokeilla."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilder för App Stores produktsidetester. Varje test använder en bild per storlek; ladda upp den du vill testa."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Images pour les tests de page produit de l’App Store. Chaque test utilise une image par taille ; importez celle que vous voulez tester."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immagini per i test della pagina prodotto dell’App Store. Ogni test usa un’immagine per dimensione; carica quella che vuoi provare."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -109,7 +109,7 @@ private struct ExportOptionsView: View {
             }
 
             Section("export.sizes") {
-                ForEach(ScreenshotTarget.all) { target in
+                ForEach(ScreenshotTarget.all.filter { !$0.isPPO }) { target in
                     Toggle(target.isRequired ? "★ \(target.size.label)" : target.size.label,
                            isOn: Binding(
                             get: { selected.contains(target.size) },
@@ -118,6 +118,21 @@ private struct ExportOptionsView: View {
                                 result = nil
                             }))
                 }
+            }
+
+            Section {
+                ForEach(ScreenshotTarget.all.filter(\.isPPO)) { target in
+                    Toggle(target.size.label, isOn: Binding(
+                        get: { selected.contains(target.size) },
+                        set: { on in
+                            if on { selected.insert(target.size) } else { selected.remove(target.size) }
+                            result = nil
+                        }))
+                }
+            } header: {
+                Text("export.ppo")
+            } footer: {
+                Text("export.ppo.note")
             }
 
             Section {

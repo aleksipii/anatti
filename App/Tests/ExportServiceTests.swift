@@ -49,4 +49,22 @@ import AnattiCore
         let measured = try await VideoConverter.measure(file)
         #expect(measured.size == PixelSize(886, 1920) && measured.hasAudio && measured.isH264)
     }
+
+    @Test func exportsPPOImagesToOwnFolder() async throws {
+        let project = Project(name: "PPO")
+        let slides = [Slide(projectID: project.id, order: 0, title: "One"),
+                      Slide(projectID: project.id, order: 1, title: "Two")]
+        let target = try #require(ScreenshotTarget.all.first { $0.size == PixelSize(1920, 1280) })
+        #expect(target.isPPO)
+
+        let result = try await ExportService.export(project: project, slides: slides, targets: [target])
+        defer { try? FileManager.default.removeItem(at: result.folder) }
+
+        #expect(result.written == 2 && result.skipped == 0)
+        for number in ["01", "02"] {
+            let file = result.folder.appendingPathComponent("AppStore/PPO/1920x1280/\(number).png")
+            let image = try #require(UIImage(data: try Data(contentsOf: file)))
+            #expect(Int(image.size.width * image.scale) == 1920 && Int(image.size.height * image.scale) == 1280)
+        }
+    }
 }

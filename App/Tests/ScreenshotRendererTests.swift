@@ -35,4 +35,14 @@ import AnattiCore
             }
         }
     }
+
+    @Test func rendersLargestPPOSize() throws {
+        let target = try #require(ScreenshotTarget.all.first { $0.size == PixelSize(5244, 2950) })
+        let output = try #require(ScreenshotRenderer.render(canvas(target.size)))
+        #expect(output.pixelSize == target.size && !output.hasAlpha)
+        for spec in target.specs {
+            #expect(RenderValidator.validate(spec: spec, size: output.pixelSize, hasAlpha: output.hasAlpha,
+                                             format: output.format, byteCount: output.data.count).isEmpty)
+        }
+    }
 }

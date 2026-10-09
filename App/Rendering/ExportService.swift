@@ -48,7 +48,8 @@ enum ExportService {
                         }
                         guard valid else { skipped += 1; continue }
                         let path = ExportPlanner.relativePath(
-                            item: ExportItem(store: storeKind, size: target.size), index: slideIndex + 1)
+                            item: ExportItem(store: storeKind, size: target.size, subfolder: target.isPPO ? "PPO" : nil),
+                            index: slideIndex + 1)
                         let url = folder.appendingPathComponent(path)
                         try fileManager.createDirectory(at: url.deletingLastPathComponent(),
                                                         withIntermediateDirectories: true)

@@ -10,6 +10,13 @@ import Testing
         #expect(ExportPlanner.relativePath(item: play, index: 2) == "GooglePlay/1080x1920/02.png")
     }
 
+    @Test func ppoGoesToItsOwnFolderAndSkipsCountWarning() {
+        let item = ExportItem(store: .appStore, size: PixelSize(5244, 2950), subfolder: "PPO")
+        #expect(ExportPlanner.relativePath(item: item, index: 1) == "AppStore/PPO/5244x2950/01.png")
+        let header = SpecCatalog.appStorePPO.first { $0.kind == .ppoHeader }!
+        #expect(ExportPlanner.warnings(slideCount: 5, specs: [header]).isEmpty)
+    }
+
     @Test func entriesCoverEverySlideAndItem() {
         let items = [ExportItem(store: .appStore, size: PixelSize(1206, 2622)),
                      ExportItem(store: .playStore, size: PixelSize(1080, 1920))]

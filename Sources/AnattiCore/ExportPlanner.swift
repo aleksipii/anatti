@@ -3,10 +3,13 @@ import Foundation
 public struct ExportItem: Hashable, Sendable {
     public let store: Store
     public let size: PixelSize
+    /// Optional folder between the store and the size, e.g. "PPO".
+    public let subfolder: String?
 
-    public init(store: Store, size: PixelSize) {
+    public init(store: Store, size: PixelSize, subfolder: String? = nil) {
         self.store = store
         self.size = size
+        self.subfolder = subfolder
     }
 }
 
@@ -36,7 +39,8 @@ public enum ExportPlanner {
 
     public static func relativePath(item: ExportItem, index: Int) -> String {
         let number = index < 10 ? "0\(index)" : "\(index)"
-        return "\(folderName(for: item.store))/\(item.size.width)x\(item.size.height)/\(number).png"
+        let parent = [folderName(for: item.store), item.subfolder].compactMap { $0 }.joined(separator: "/")
+        return "\(parent)/\(item.size.width)x\(item.size.height)/\(number).png"
     }
 
     public static func entries(slideCount: Int, items: [ExportItem]) -> [ExportEntry] {
@@ -49,6 +53,8 @@ public enum ExportPlanner {
     }
 
     public static func warnings(slideCount: Int, specs: [AssetSpec]) -> [ExportWarning] {
+        // PPO sizes hold one image per product page test, so the count limit does not apply to them.
+        let specs = specs.filter { !$0.kind.isPPO }
         var result: [ExportWarning] = []
         if let max = specs.map(\.maxCount).min(), slideCount > max {
             result.append(.tooMany(max: max, have: slideCount))
@@ -58,4 +64,8 @@ public enum ExportPlanner {
         }
         return result
     }
+}
+
+public extension AssetKind {
+    var isPPO: Bool { self == .ppoHeader || self == .ppoSearchResults }
 }
