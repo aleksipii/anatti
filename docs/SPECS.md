@@ -50,20 +50,24 @@ Puuttuvan koon Apple skaalaa varakoosta. Vahvistettu myös käyttäjän App Stor
 | Header | 5244×2950, 3840×1646 |
 | Search Results | 5244×2950, 3840×2560, 1920×1280 |
 
-## Google Play
-Lähteet pääosin kolmansia osapuolia (Googlen ohjesivu oli estetty). **Vahvista Play Consolesta.**
+## Google Play (Play Consolen omat tekstit, 2026-10-09)
+Kuvakaappaukset: PNG/JPEG, 16:9 tai 9:16.
 
-| Materiaali | Vaatimus |
-|---|---|
-| Sovelluskuvake | 512×512, 32-bit PNG (alfa ok), ≤1024 KB |
-| Feature graphic | 1024×500, JPEG/24-bit PNG, ei alfaa |
-| Puhelinkuvat | 2–8 kpl, suositus 1080×1920; sivu 320–3840 px, pitkä sivu ≤2× lyhyt |
-| 7"/10" tabletti, Chromebook | enintään 8 kpl, suositus ≥4 kpl, 16:9 tai 9:16, tarkka koko vahvistettava |
-| Wear OS | 1:1, väh. 384×384, ei kehyksiä |
-| Android TV | 16:9, väh. 1920×1080; banneri 1280×720 |
-| Android Automotive OS | 2× 800×1280 pysty + 2× 1024×768 vaaka |
-| Esittelyvideo | valinnainen; käytännössä YouTube-linkki (vahvista) |
-| Kuvasisältö | oikeaa sovelluskäyttöä, Google voi hylätä harhaanjohtavat/kehystetyt kuvat (vahvista) |
+| Materiaali | Määrä | Sivut (px) | Max koko |
+|---|---|---|---|
+| Puhelin | 2–8 | 320–3840 | 8 MB |
+| 7" tabletti | enintään 8 | 320–3840 | 8 MB |
+| 10" tabletti | enintään 8 | 1080–7680 | 8 MB |
+| Työpöytä | 4–8 | 1080–7680 | 8 MB |
+| Android XR | 4–8 | 720–7680 | 15 MB |
+| Ominaisuuskuva | 1 | täsmälleen 1024×500 | 15 MB |
+| Sovelluskuvake | 1 | täsmälleen 512×512 | 1 MB |
+
+Huomioita:
+- Kuvake: Console sallii PNG tai JPEG (aiempi arvio "32-bit PNG" ei pitänyt).
+- Kuvakaappaukset ovat vaihteluvälejä, ei kiinteitä kokoja. Suositus puhelimelle 1080×1920.
+- Esittelyvideo: valinnainen; käytännössä YouTube-linkki (vahvista).
+- Ei Console-tekstissä, kolmannen osapuolen tietoa (VAHVISTA): Wear OS 1:1 väh. 384×384; Android TV 16:9 väh. 1920×1080 ja banneri 1280×720; Automotive 2× 800×1280 + 2× 1024×768.
 
 ## Lähteet
 - Apple: Screenshot specifications, App preview specifications (App Store Connect Help)

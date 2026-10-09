@@ -42,13 +42,22 @@ public struct AssetSpec: Identifiable, Hashable, Codable, Sendable {
     public let formats: [FileFormat]
     public let allowsAlpha: Bool
     public let notes: String
+    /// Play Console: sallittu pituus kummallekin sivulle (ei kiinteitä kokoja).
+    public var sideRange: ClosedRange<Int>? = nil
+    /// Play Console: sallitut kuvasuhteet (leveys, korkeus), pysty- ja vaakasuunta.
+    public var aspectRatios: [PixelSize] = []
+    public var maxFileMB: Int? = nil
 
     public var allAcceptedSizes: [PixelSize] {
         landscapeToo ? sizes + sizes.map(\.swapped) : sizes
     }
 
     public func accepts(_ size: PixelSize) -> Bool {
-        allAcceptedSizes.contains(size)
+        if let range = sideRange {
+            guard range.contains(size.width), range.contains(size.height) else { return false }
+            return aspectRatios.contains { $0.width * size.height == $0.height * size.width }
+        }
+        return allAcceptedSizes.contains(size)
     }
 }
 

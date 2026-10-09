@@ -49,4 +49,4 @@ SwiftUI/Liquid Glass -kehittäjä · StoreKit 2 -asiantuntija · AVFoundation (v
 - Tarvitaanko laitekehyksiä? Google Play voi hylätä kehystetyt kuvat (vahvista) ja Applen kehykset vaativat lisenssitarkistuksen.
 - Play-esittelyvideo on käytännössä YouTube-linkki, joten sovellus voi vain tuottaa videotiedoston (vahvista).
 - Tilaukselle: kokeilujakso? Vuosihinta?
-- Play Storen tabletti-/Chromebook-koot tulevat kolmannen osapuolen lähteistä ja vaativat vahvistuksen Play Consolesta.
+- Play-kuvien koot on vahvistettu Play Consolen omista teksteistä (Wear, TV ja Automotive ovat vielä kolmannen osapuolen tietoa).

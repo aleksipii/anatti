@@ -113,47 +113,57 @@ public enum SpecCatalog {
                   formats: img, allowsAlpha: false, notes: "Vaakakoko, ei käännetä"),
     ]
 
-    // MARK: Play Store
+    // MARK: Play Store (Play Consolen omat vaatimukset)
+
+    private static let ratios16x9 = [PixelSize(16, 9), PixelSize(9, 16)]
+
+    private static func playShot(_ id: String, _ device: String, sides: ClosedRange<Int>,
+                                 min: Int, max: Int = 8, mb: Int = 8, notes: String = "",
+                                 recommended: PixelSize) -> AssetSpec {
+        AssetSpec(id: id, store: .playStore, kind: .screenshot, deviceClass: device,
+                  sizes: [recommended], landscapeToo: true, required: min > 0,
+                  minCount: min, maxCount: max, formats: img, allowsAlpha: false, notes: notes,
+                  sideRange: sides, aspectRatios: ratios16x9, maxFileMB: mb)
+    }
 
     public static let playStore: [AssetSpec] = [
         AssetSpec(id: "gp.icon", store: .playStore, kind: .icon, deviceClass: "Sovelluskuvake",
                   sizes: [PixelSize(512, 512)], landscapeToo: false, required: true,
-                  minCount: 1, maxCount: 1, formats: [.png], allowsAlpha: true,
-                  notes: "32-bit PNG, enintään 1024 KB"),
-        AssetSpec(id: "gp.feature", store: .playStore, kind: .featureGraphic, deviceClass: "Feature graphic",
+                  minCount: 1, maxCount: 1, formats: img, allowsAlpha: true,
+                  notes: "Noudata kuvakesuunnittelun määrityksiä ja metadatakäytäntöä",
+                  maxFileMB: 1),
+        AssetSpec(id: "gp.feature", store: .playStore, kind: .featureGraphic, deviceClass: "Ominaisuuskuva",
                   sizes: [PixelSize(1024, 500)], landscapeToo: false, required: true,
                   minCount: 1, maxCount: 1, formats: img, allowsAlpha: false,
-                  notes: "Pidä sisältö keskellä, reunat voidaan rajata"),
-        AssetSpec(id: "gp.shot.phone", store: .playStore, kind: .screenshot, deviceClass: "Puhelin",
-                  sizes: [PixelSize(1080, 1920)], landscapeToo: true, required: true,
-                  minCount: 2, maxCount: 8, formats: img, allowsAlpha: false,
-                  notes: "Suositus 1080×1920. Sallittu: sivu 320–3840 px, pitkä sivu enintään 2× lyhyt"),
-        AssetSpec(id: "gp.shot.tablet7", store: .playStore, kind: .screenshot, deviceClass: "7\" tabletti",
-                  sizes: [PixelSize(1080, 1920)], landscapeToo: true, required: false,
-                  minCount: 4, maxCount: 8, formats: img, allowsAlpha: false,
-                  notes: "VAHVISTA Play Consolesta tarkka koko"),
-        AssetSpec(id: "gp.shot.tablet10", store: .playStore, kind: .screenshot, deviceClass: "10\" tabletti",
-                  sizes: [PixelSize(1200, 1920)], landscapeToo: true, required: false,
-                  minCount: 4, maxCount: 8, formats: img, allowsAlpha: false,
-                  notes: "VAHVISTA Play Consolesta tarkka koko"),
-        AssetSpec(id: "gp.shot.chromebook", store: .playStore, kind: .screenshot, deviceClass: "Chromebook",
-                  sizes: [PixelSize(1080, 1920)], landscapeToo: true, required: false,
-                  minCount: 4, maxCount: 8, formats: img, allowsAlpha: false,
-                  notes: "VAHVISTA Play Consolesta tarkka koko"),
+                  notes: "Pidä sisältö keskellä, reunat voidaan rajata", maxFileMB: 15),
+        playShot("gp.shot.phone", "Puhelin", sides: 320...3840, min: 2,
+                 recommended: PixelSize(1080, 1920)),
+        playShot("gp.shot.tablet7", "7\" tabletti", sides: 320...3840, min: 0,
+                 recommended: PixelSize(1080, 1920)),
+        playShot("gp.shot.tablet10", "10\" tabletti", sides: 1080...7680, min: 0,
+                 recommended: PixelSize(1200, 1920)),
+        playShot("gp.shot.desktop", "Työpöytä (Chromebook)", sides: 1080...7680, min: 4,
+                 notes: "Vaaditaan vain jos sovellus tukee työpöytää",
+                 recommended: PixelSize(1920, 1080)),
+        playShot("gp.shot.xr", "Android XR", sides: 720...7680, min: 4, mb: 15,
+                 notes: "Vaaditaan vain jos sovellus tukee XR:ää",
+                 recommended: PixelSize(1920, 1080)),
         AssetSpec(id: "gp.shot.wear", store: .playStore, kind: .screenshot, deviceClass: "Wear OS",
                   sizes: [PixelSize(384, 384)], landscapeToo: false, required: false,
                   minCount: 1, maxCount: 8, formats: img, allowsAlpha: false,
-                  notes: "Suhde 1:1, vähintään 384×384, ei kehyksiä"),
+                  notes: "Kolmas osapuoli: 1:1, väh. 384×384, ei kehyksiä. VAHVISTA"),
         AssetSpec(id: "gp.shot.tv", store: .playStore, kind: .screenshot, deviceClass: "Android TV",
                   sizes: [PixelSize(1920, 1080)], landscapeToo: false, required: false,
-                  minCount: 1, maxCount: 8, formats: img, allowsAlpha: false, notes: "16:9"),
+                  minCount: 1, maxCount: 8, formats: img, allowsAlpha: false,
+                  notes: "Kolmas osapuoli: 16:9. VAHVISTA"),
         AssetSpec(id: "gp.banner.tv", store: .playStore, kind: .banner, deviceClass: "Android TV -banneri",
                   sizes: [PixelSize(1280, 720)], landscapeToo: false, required: false,
-                  minCount: 0, maxCount: 1, formats: img, allowsAlpha: false, notes: ""),
+                  minCount: 0, maxCount: 1, formats: img, allowsAlpha: false,
+                  notes: "Kolmas osapuoli. VAHVISTA"),
         AssetSpec(id: "gp.shot.auto", store: .playStore, kind: .screenshot, deviceClass: "Android Automotive OS",
                   sizes: [PixelSize(800, 1280), PixelSize(1024, 768)], landscapeToo: false, required: false,
                   minCount: 2, maxCount: 8, formats: img, allowsAlpha: false,
-                  notes: "2 pysty (800×1280) ja 2 vaaka (1024×768)"),
+                  notes: "Kolmas osapuoli: 2 pysty + 2 vaaka. VAHVISTA"),
     ]
 
     public static var all: [AssetSpec] {

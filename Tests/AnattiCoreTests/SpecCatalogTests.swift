@@ -19,4 +19,15 @@ import Testing
         let limits = VideoLimits()
         #expect(limits.minSeconds == 15 && limits.maxSeconds == 30)
     }
+
+    @Test func playRangesAndRatios() {
+        let phone = SpecCatalog.playStore.first { $0.id == "gp.shot.phone" }
+        #expect(phone?.accepts(PixelSize(1080, 1920)) == true)
+        #expect(phone?.accepts(PixelSize(3840, 2160)) == true)
+        #expect(phone?.accepts(PixelSize(1080, 2400)) == false)   // ei 16:9
+        #expect(phone?.accepts(PixelSize(180, 320)) == false)     // alle 320 px
+        let tablet10 = SpecCatalog.playStore.first { $0.id == "gp.shot.tablet10" }
+        #expect(tablet10?.accepts(PixelSize(720, 1280)) == false) // alle 1080 px
+        #expect(tablet10?.maxFileMB == 8)
+    }
 }
