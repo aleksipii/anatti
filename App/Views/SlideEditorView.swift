@@ -9,6 +9,7 @@ struct SlideEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var pickerItem: PhotosPickerItem?
     @State private var sourceImage: UIImage?
+    @State private var language = ""
     @State private var target = ScreenshotTarget.default
     @State private var checkResult: CheckResult?
 
@@ -36,8 +37,13 @@ struct SlideEditorView: View {
             }
 
             Section {
-                TextField("editor.headline", text: $slide.title)
-                TextField("editor.caption", text: $slide.subtitle)
+                if project.languages.count > 1 {
+                    Picker("editor.language", selection: Binding(get: { activeLanguage }, set: { language = $0 })) {
+                        ForEach(project.languages, id: \.self) { Text(languageName($0)).tag($0) }
+                    }
+                }
+                TextField("editor.headline", text: textBinding(\.title), prompt: Text(basePrompt(\.title)))
+                TextField("editor.caption", text: textBinding(\.subtitle), prompt: Text(basePrompt(\.subtitle)))
                 Picker("editor.placement", selection: $slide.placement) {
                     Text("editor.placement.top").tag(TextPlacement.top)
                     Text("editor.placement.bottom").tag(TextPlacement.bottom)
@@ -72,9 +78,31 @@ struct SlideEditorView: View {
         .onChange(of: target) { _, _ in checkResult = nil }
     }
 
+    private var activeLanguage: String {
+        project.languages.contains(language) ? language : project.baseLanguage
+    }
+
+    /// Edits the text of the selected language only; other languages keep their own text.
+    private func textBinding(_ keyPath: WritableKeyPath<SlideText, String>) -> Binding<String> {
+        Binding(
+            get: { slide.rawText(language: activeLanguage, baseLanguage: project.baseLanguage)[keyPath: keyPath] },
+            set: { value in
+                var text = slide.rawText(language: activeLanguage, baseLanguage: project.baseLanguage)
+                text[keyPath: keyPath] = value
+                slide.setRawText(text, language: activeLanguage, baseLanguage: project.baseLanguage)
+            })
+    }
+
+    /// An empty field in a non-base language shows the base text it will fall back to.
+    private func basePrompt(_ keyPath: KeyPath<SlideText, String>) -> String {
+        activeLanguage == project.baseLanguage ? "" : slide.resolvedText(
+            language: project.baseLanguage, baseLanguage: project.baseLanguage)[keyPath: keyPath]
+    }
+
     private func canvas(size: PixelSize) -> ScreenshotCanvas {
-        ScreenshotCanvas(size: size, placement: slide.placement, title: slide.title,
-                         subtitle: slide.subtitle, topHex: project.primaryColorHex,
+        let text = slide.resolvedText(language: activeLanguage, baseLanguage: project.baseLanguage)
+        return ScreenshotCanvas(size: size, placement: slide.placement, title: text.title,
+                         subtitle: text.subtitle, topHex: project.primaryColorHex,
                          bottomHex: project.secondaryColorHex, image: sourceImage)
     }
 

@@ -40,3 +40,8 @@ final class Project {
         self.selectedSpecIDs = selectedSpecIDs
     }
 }
+
+extension Project {
+    /// The first language is the default for all slide text.
+    var baseLanguage: String { languages.first ?? "en" }
+}

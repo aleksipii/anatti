@@ -2,7 +2,7 @@ import SwiftUI
 import AnattiCore
 
 /// Renders every slide at every chosen size into a temporary folder laid out as
-/// `<Store>/<WxH>/<NN>.png`. Files that fail validation are skipped, never written.
+/// `<Store>[/<language>]/<WxH>/<NN>.png`. Files that fail validation are skipped, never written.
 @MainActor
 enum ExportService {
     struct Result {
@@ -28,40 +28,47 @@ enum ExportService {
 
         let ordered = slides.sorted { $0.order < $1.order }
         let orderedVideos = videos.sorted { $0.createdAt < $1.createdAt }
-        let total = max(ordered.count * targets.count + orderedVideos.count * videoTargets.count + playAssets.count, 1)
+        // One folder per language when the project has several; single-language projects stay flat.
+        let languageCodes: [String?] = project.languages.count > 1 ? project.languages : [nil]
+        let total = max(ordered.count * targets.count * languageCodes.count + orderedVideos.count * videoTargets.count + playAssets.count, 1)
         var done = 0, written = 0, skipped = 0
 
-        for (slideIndex, slide) in ordered.enumerated() {
-            let image = slide.sourceFilename.flatMap { try? store.load($0) }.flatMap(UIImage.init(data:))
-            for target in targets {
-                try Task.checkCancellation()
-                let canvas = ScreenshotCanvas(
-                    size: target.size, placement: slide.placement, title: slide.title,
-                    subtitle: slide.subtitle, topHex: project.primaryColorHex,
-                    bottomHex: project.secondaryColorHex, image: image)
-                if let output = ScreenshotRenderer.render(canvas) {
-                    for storeKind in Set(target.specs.map(\.store)) {
-                        let specs = target.specs.filter { $0.store == storeKind }
-                        let valid = specs.allSatisfy {
-                            RenderValidator.validate(spec: $0, size: output.pixelSize, hasAlpha: output.hasAlpha,
-                                                     format: .png, byteCount: output.data.count).isEmpty
+        for languageCode in languageCodes {
+            for (slideIndex, slide) in ordered.enumerated() {
+                let image = slide.sourceFilename.flatMap { try? store.load($0) }.flatMap(UIImage.init(data:))
+                let text = slide.resolvedText(language: languageCode ?? project.baseLanguage,
+                                              baseLanguage: project.baseLanguage)
+                for target in targets {
+                    try Task.checkCancellation()
+                    let canvas = ScreenshotCanvas(
+                        size: target.size, placement: slide.placement, title: text.title,
+                        subtitle: text.subtitle, topHex: project.primaryColorHex,
+                        bottomHex: project.secondaryColorHex, image: image)
+                    if let output = ScreenshotRenderer.render(canvas) {
+                        for storeKind in Set(target.specs.map(\.store)) {
+                            let specs = target.specs.filter { $0.store == storeKind }
+                            let valid = specs.allSatisfy {
+                                RenderValidator.validate(spec: $0, size: output.pixelSize, hasAlpha: output.hasAlpha,
+                                                         format: .png, byteCount: output.data.count).isEmpty
+                            }
+                            guard valid else { skipped += 1; continue }
+                            let item = ExportItem(
+                                store: storeKind, size: target.size, subfolder: target.isPPO ? "PPO" : nil,
+                                language: languageCode.map(SupportedLanguage.exportFolder(forCode:)))
+                            let url = folder.appendingPathComponent(
+                                ExportPlanner.relativePath(item: item, index: slideIndex + 1))
+                            try fileManager.createDirectory(at: url.deletingLastPathComponent(),
+                                                            withIntermediateDirectories: true)
+                            try output.data.write(to: url, options: .atomic)
+                            written += 1
                         }
-                        guard valid else { skipped += 1; continue }
-                        let path = ExportPlanner.relativePath(
-                            item: ExportItem(store: storeKind, size: target.size, subfolder: target.isPPO ? "PPO" : nil),
-                            index: slideIndex + 1)
-                        let url = folder.appendingPathComponent(path)
-                        try fileManager.createDirectory(at: url.deletingLastPathComponent(),
-                                                        withIntermediateDirectories: true)
-                        try output.data.write(to: url, options: .atomic)
-                        written += 1
+                    } else {
+                        skipped += 1
                     }
-                } else {
-                    skipped += 1
+                    done += 1
+                    progress(Double(done) / Double(total))
+                    await Task.yield()   // keep the UI responsive between renders
                 }
-                done += 1
-                progress(Double(done) / Double(total))
-                await Task.yield()   // keep the UI responsive between renders
             }
         }
 

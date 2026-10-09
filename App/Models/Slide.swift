@@ -12,6 +12,8 @@ final class Slide {
     var title: String
     var subtitle: String
     var placementRaw: String
+    /// JSON of per-language overrides, see `SlideTexts`. The title/subtitle above belong to the project's first language.
+    var textsJSON: String = "{}"
     /// File name inside LocalFileStore.
     var sourceFilename: String?
 
@@ -36,6 +38,32 @@ final class Slide {
     var placement: TextPlacement {
         get { TextPlacement(rawValue: placementRaw) ?? .top }
         set { placementRaw = newValue.rawValue }
+    }
+}
+
+extension Slide {
+    /// What the user typed for this language: the slide's own fields for the base language, otherwise its override.
+    func rawText(language: String, baseLanguage: String) -> SlideText {
+        if language == baseLanguage { return SlideText(title: title, subtitle: subtitle) }
+        return SlideTexts.decode(textsJSON)[language] ?? SlideText()
+    }
+
+    func setRawText(_ text: SlideText, language: String, baseLanguage: String) {
+        if language == baseLanguage {
+            title = text.title
+            subtitle = text.subtitle
+        } else {
+            var map = SlideTexts.decode(textsJSON)
+            map[language] = text
+            textsJSON = SlideTexts.encode(map)
+        }
+    }
+
+    /// Text to draw for a language, falling back to the base language per field.
+    func resolvedText(language: String, baseLanguage: String) -> SlideText {
+        SlideTexts.resolve(language: language, baseLanguage: baseLanguage,
+                           base: SlideText(title: title, subtitle: subtitle),
+                           overrides: SlideTexts.decode(textsJSON))
     }
 }
 

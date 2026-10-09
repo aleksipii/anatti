@@ -5,11 +5,14 @@ public struct ExportItem: Hashable, Sendable {
     public let size: PixelSize
     /// Optional folder between the store and the size, e.g. "PPO".
     public let subfolder: String?
+    /// Language folder between the store and the rest; nil for single-language projects.
+    public let language: String?
 
-    public init(store: Store, size: PixelSize, subfolder: String? = nil) {
+    public init(store: Store, size: PixelSize, subfolder: String? = nil, language: String? = nil) {
         self.store = store
         self.size = size
         self.subfolder = subfolder
+        self.language = language
     }
 }
 
@@ -39,7 +42,7 @@ public enum ExportPlanner {
 
     public static func relativePath(item: ExportItem, index: Int) -> String {
         let number = index < 10 ? "0\(index)" : "\(index)"
-        let parent = [folderName(for: item.store), item.subfolder].compactMap { $0 }.joined(separator: "/")
+        let parent = [folderName(for: item.store), item.language, item.subfolder].compactMap { $0 }.joined(separator: "/")
         return "\(parent)/\(item.size.width)x\(item.size.height)/\(number).png"
     }
 

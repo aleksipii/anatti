@@ -67,4 +67,28 @@ import AnattiCore
             #expect(Int(image.size.width * image.scale) == 1920 && Int(image.size.height * image.scale) == 1280)
         }
     }
+
+    @Test func exportsOneFolderPerLanguage() async throws {
+        let project = Project(name: "Lang", languages: ["en", "fi"])
+        let slide = Slide(projectID: project.id, order: 0, title: "Track habits", subtitle: "Simple")
+        slide.setRawText(SlideText(title: "Seuraa tapoja", subtitle: ""), language: "fi", baseLanguage: "en")
+        let target = try #require(ScreenshotTarget.all.first { $0.size == PixelSize(1206, 2622) })
+
+        let result = try await ExportService.export(project: project, slides: [slide], targets: [target])
+        defer { try? FileManager.default.removeItem(at: result.folder) }
+
+        #expect(result.written == 2 && result.skipped == 0)
+        let english = try Data(contentsOf: result.folder.appendingPathComponent("AppStore/en-US/1206x2622/01.png"))
+        let finnish = try Data(contentsOf: result.folder.appendingPathComponent("AppStore/fi/1206x2622/01.png"))
+        #expect(english != finnish, "the Finnish image must use the Finnish text")
+    }
+
+    @Test func singleLanguageStaysFlat() async throws {
+        let project = Project(name: "One")
+        let slide = Slide(projectID: project.id, order: 0, title: "A")
+        let target = try #require(ScreenshotTarget.all.first { $0.size == PixelSize(1206, 2622) })
+        let result = try await ExportService.export(project: project, slides: [slide], targets: [target])
+        defer { try? FileManager.default.removeItem(at: result.folder) }
+        #expect(FileManager.default.fileExists(atPath: result.folder.appendingPathComponent("AppStore/1206x2622/01.png").path))
+    }
 }

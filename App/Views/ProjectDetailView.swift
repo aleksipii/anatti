@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AnattiCore
 import PhotosUI
 import AVFoundation
 
@@ -37,6 +38,17 @@ struct ProjectDetailView: View {
                     }
                 }
                 TextField("project.tagline", text: $project.tagline)
+            }
+
+            Section {
+                ForEach(SupportedLanguage.allCases, id: \.self) { language in
+                    Toggle(languageName(language.rawValue), isOn: languageBinding(language))
+                        .disabled(project.baseLanguage == language.rawValue)
+                }
+            } header: {
+                Text("project.languages")
+            } footer: {
+                Text("project.languages.note")
             }
 
             Section("project.colors") {
@@ -109,6 +121,19 @@ struct ProjectDetailView: View {
                 }
             }
         }
+    }
+
+    /// The first language is the default for all texts, so it cannot be switched off.
+    private func languageBinding(_ language: SupportedLanguage) -> Binding<Bool> {
+        Binding(
+            get: { project.languages.contains(language.rawValue) },
+            set: { on in
+                if on, !project.languages.contains(language.rawValue) {
+                    project.languages.append(language.rawValue)
+                } else if !on, project.baseLanguage != language.rawValue {
+                    project.languages.removeAll { $0 == language.rawValue }
+                }
+            })
     }
 
     private func colorBinding(_ keyPath: ReferenceWritableKeyPath<Project, String>) -> Binding<Color> {
