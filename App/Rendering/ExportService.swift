@@ -17,6 +17,7 @@ enum ExportService {
         targets: [ScreenshotTarget],
         videos: [SourceAsset] = [],
         videoTargets: [VideoTarget] = [],
+        playAssets: [PlayAsset] = [],
         store: LocalFileStore = .shared,
         progress: (Double) -> Void = { _ in }
     ) async throws -> Result {
@@ -27,7 +28,7 @@ enum ExportService {
 
         let ordered = slides.sorted { $0.order < $1.order }
         let orderedVideos = videos.sorted { $0.createdAt < $1.createdAt }
-        let total = max(ordered.count * targets.count + orderedVideos.count * videoTargets.count, 1)
+        let total = max(ordered.count * targets.count + orderedVideos.count * videoTargets.count + playAssets.count, 1)
         var done = 0, written = 0, skipped = 0
 
         for (slideIndex, slide) in ordered.enumerated() {
@@ -43,7 +44,7 @@ enum ExportService {
                         let specs = target.specs.filter { $0.store == storeKind }
                         let valid = specs.allSatisfy {
                             RenderValidator.validate(spec: $0, size: output.pixelSize, hasAlpha: output.hasAlpha,
-                                                     format: .png, byteCount: output.png.count).isEmpty
+                                                     format: .png, byteCount: output.data.count).isEmpty
                         }
                         guard valid else { skipped += 1; continue }
                         let path = ExportPlanner.relativePath(
@@ -51,7 +52,7 @@ enum ExportService {
                         let url = folder.appendingPathComponent(path)
                         try fileManager.createDirectory(at: url.deletingLastPathComponent(),
                                                         withIntermediateDirectories: true)
-                        try output.png.write(to: url, options: .atomic)
+                        try output.data.write(to: url, options: .atomic)
                         written += 1
                     }
                 } else {
@@ -76,6 +77,30 @@ enum ExportService {
                 }
                 done += 1
                 progress(Double(done) / Double(total))
+            }
+        }
+
+        if !playAssets.isEmpty {
+            let icon = project.appIconFilename.flatMap { try? store.load($0) }.flatMap(UIImage.init(data:))
+            for asset in playAssets {
+                try Task.checkCancellation()
+                let output = PlayAssetRenderer.render(asset, project: project, icon: icon)
+                if let output,
+                   RenderValidator.validate(spec: asset.spec, size: output.pixelSize, hasAlpha: output.hasAlpha,
+                                            format: output.format, byteCount: output.data.count).isEmpty {
+                    let path = ExportPlanner.brandAssetPath(
+                        kind: asset.spec.kind, size: output.pixelSize,
+                        fileExtension: output.format == .jpeg ? "jpg" : "png")
+                    let url = folder.appendingPathComponent(path)
+                    try fileManager.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+                    try output.data.write(to: url, options: .atomic)
+                    written += 1
+                } else {
+                    skipped += 1
+                }
+                done += 1
+                progress(Double(done) / Double(total))
+                await Task.yield()
             }
         }
         return Result(folder: folder, written: written, skipped: skipped)

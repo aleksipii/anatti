@@ -30,7 +30,7 @@ import AnattiCore
             let output = try #require(ScreenshotRenderer.render(canvas(target.size)))
             for spec in target.specs {
                 let issues = RenderValidator.validate(spec: spec, size: output.pixelSize, hasAlpha: output.hasAlpha,
-                                                      format: .png, byteCount: output.png.count)
+                                                      format: .png, byteCount: output.data.count)
                 #expect(issues.isEmpty, "\(spec.id) \(target.size.label): \(issues)")
             }
         }

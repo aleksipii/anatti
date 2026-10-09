@@ -8,6 +8,8 @@ final class Project {
     var createdAt: Date
     /// File name (inside LocalFileStore) of the user's app icon, if any.
     var appIconFilename: String?
+    /// Short line shown next to the name on Play graphics.
+    var tagline: String = ""
     /// Colors stored as "#RRGGBB".
     var primaryColorHex: String
     var secondaryColorHex: String
@@ -21,6 +23,7 @@ final class Project {
         name: String,
         createdAt: Date = .now,
         appIconFilename: String? = nil,
+        tagline: String = "",
         primaryColorHex: String = "#0A84FF",
         secondaryColorHex: String = "#5E5CE6",
         languages: [String] = ["en"],
@@ -30,6 +33,7 @@ final class Project {
         self.name = name
         self.createdAt = createdAt
         self.appIconFilename = appIconFilename
+        self.tagline = tagline
         self.primaryColorHex = primaryColorHex
         self.secondaryColorHex = secondaryColorHex
         self.languages = languages

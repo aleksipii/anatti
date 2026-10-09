@@ -3,23 +3,33 @@ import ImageIO
 import UniformTypeIdentifiers
 import AnattiCore
 
-/// Renders a `ScreenshotCanvas` to an opaque PNG at its exact pixel size.
+/// Renders a SwiftUI view to an opaque image at its exact pixel size (PNG, or JPEG as a size fallback).
 @MainActor
 enum ScreenshotRenderer {
     struct Output {
-        let png: Data
+        let data: Data
+        let format: FileFormat
         let pixelSize: PixelSize
-        /// Read back from the encoded PNG, not assumed.
+        /// Read back from the encoded file, not assumed.
         let hasAlpha: Bool
     }
 
-    static func render(_ canvas: ScreenshotCanvas) -> Output? {
-        let renderer = ImageRenderer(content: canvas)
+    /// `maxBytes`: when the PNG is larger, the image is encoded as JPEG instead.
+    static func render(_ content: some View, maxBytes: Int? = nil) -> Output? {
+        let renderer = ImageRenderer(content: content)
         renderer.scale = 1
         renderer.isOpaque = true
         guard let rendered = renderer.cgImage, let opaque = flatten(rendered) else { return nil }
+        let size = PixelSize(opaque.width, opaque.height)
         guard let png = encodePNG(opaque) else { return nil }
-        return Output(png: png, pixelSize: PixelSize(opaque.width, opaque.height), hasAlpha: pngHasAlpha(png))
+        if let maxBytes, png.count > maxBytes {
+            for quality in [0.92, 0.85, 0.75, 0.6] {
+                if let jpeg = encodeJPEG(opaque, quality: quality), jpeg.count <= maxBytes {
+                    return Output(data: jpeg, format: .jpeg, pixelSize: size, hasAlpha: false)
+                }
+            }
+        }
+        return Output(data: png, format: .png, pixelSize: size, hasAlpha: pngHasAlpha(png))
     }
 
     /// Flattens onto white and returns a 24-bit RGB image with no alpha channel.
@@ -69,6 +79,15 @@ enum ScreenshotRenderer {
             return nil
         }
         CGImageDestinationAddImage(destination, image, nil)
+        return CGImageDestinationFinalize(destination) ? data as Data : nil
+    }
+
+    private static func encodeJPEG(_ image: CGImage, quality: Double) -> Data? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
+            return nil
+        }
+        CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary)
         return CGImageDestinationFinalize(destination) ? data as Data : nil
     }
 

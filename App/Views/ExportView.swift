@@ -65,6 +65,7 @@ private struct ExportOptionsView: View {
     @Query private var slides: [Slide]
     @Query private var assets: [SourceAsset]
     @State private var selectedVideoSizes: Set<PixelSize> = []
+    @State private var selectedPlay: Set<PlayAsset> = []
     @State private var selected: Set<PixelSize> = Set(ScreenshotTarget.all.filter(\.isRequired).map(\.size))
     @State private var progress = 0.0
     @State private var isExporting = false
@@ -93,8 +94,12 @@ private struct ExportOptionsView: View {
         videos.isEmpty ? [] : ExportPlanner.warnings(slideCount: videos.count, specs: videoTargets.flatMap(\.specs))
     }
 
+    private var playAssets: [PlayAsset] { PlayAsset.allCases.filter { selectedPlay.contains($0) } }
+
+    private var hasIcon: Bool { project.appIconFilename != nil }
+
     private var hasWork: Bool {
-        (!slides.isEmpty && !targets.isEmpty) || (!videos.isEmpty && !videoTargets.isEmpty)
+        (!slides.isEmpty && !targets.isEmpty) || (!videos.isEmpty && !videoTargets.isEmpty) || !playAssets.isEmpty
     }
 
     var body: some View {
@@ -113,6 +118,28 @@ private struct ExportOptionsView: View {
                                 result = nil
                             }))
                 }
+            }
+
+            Section {
+                ForEach(PlayAsset.allCases) { asset in
+                    Toggle(isOn: Binding(
+                        get: { selectedPlay.contains(asset) },
+                        set: { on in
+                            if on { selectedPlay.insert(asset) } else { selectedPlay.remove(asset) }
+                            result = nil
+                        })) {
+                        VStack(alignment: .leading) {
+                            Text(asset.titleKey)
+                            Text(asset.size.label).font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .disabled(asset.needsIcon && !hasIcon)
+                }
+                if !hasIcon {
+                    Text("export.play.noicon").font(.caption).foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("export.play")
             }
 
             if !videos.isEmpty {
@@ -202,7 +229,7 @@ private struct ExportOptionsView: View {
             do {
                 result = try await ExportService.export(
                     project: project, slides: slides, targets: slides.isEmpty ? [] : targets,
-                    videos: videos, videoTargets: videoTargets,
+                    videos: videos, videoTargets: videoTargets, playAssets: playAssets,
                     progress: { progress = $0 })
             } catch {
                 failed = true

@@ -130,13 +130,13 @@ struct SlideEditorView: View {
         var issues: [RenderIssue] = []
         for spec in target.specs {
             for issue in RenderValidator.validate(spec: spec, size: output.pixelSize, hasAlpha: output.hasAlpha,
-                                                  format: .png, byteCount: output.png.count)
+                                                  format: .png, byteCount: output.data.count)
             where !issues.contains(issue) {
                 issues.append(issue)
             }
         }
         checkResult = issues.isEmpty
-            ? .ok(sizeLabel: output.pixelSize.label, bytes: output.png.count)
+            ? .ok(sizeLabel: output.pixelSize.label, bytes: output.data.count)
             : .issues(issues)
     }
 

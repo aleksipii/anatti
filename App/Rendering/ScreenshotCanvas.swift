@@ -14,12 +14,7 @@ struct ScreenshotCanvas: View {
 
     private var layout: ScreenshotLayout { ScreenshotLayout(canvas: size, placement: placement) }
 
-    private var prefersLightText: Bool {
-        let top = HexColor.parse(topHex) ?? RGB(r: 0, g: 0, b: 0)
-        let bottom = HexColor.parse(bottomHex) ?? RGB(r: 0, g: 0, b: 0)
-        let mid = RGB(r: (top.r + bottom.r) / 2, g: (top.g + bottom.g) / 2, b: (top.b + bottom.b) / 2)
-        return mid.prefersLightText
-    }
+    private var prefersLightText: Bool { HexColor.prefersLightText(topHex: topHex, bottomHex: bottomHex) }
 
     var body: some View {
         let layout = layout

@@ -10,6 +10,8 @@ struct ProjectDetailView: View {
     @Query private var assets: [SourceAsset]
     @State private var videoItem: PhotosPickerItem?
     @State private var importFailed = false
+    @State private var iconItem: PhotosPickerItem?
+    @State private var iconImage: UIImage?
 
     init(project: Project) {
         self.project = project
@@ -20,6 +22,23 @@ struct ProjectDetailView: View {
 
     var body: some View {
         List {
+            Section("project.brand") {
+                HStack {
+                    if let iconImage {
+                        Image(uiImage: iconImage)
+                            .resizable().scaledToFill()
+                            .frame(width: 44, height: 44)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .accessibilityHidden(true)
+                    }
+                    PhotosPicker(selection: $iconItem, matching: .images) {
+                        Label(project.appIconFilename == nil ? "project.icon.choose" : "project.icon.replace",
+                              systemImage: "app.dashed")
+                    }
+                }
+                TextField("project.tagline", text: $project.tagline)
+            }
+
             Section("project.colors") {
                 ColorPicker("project.color.top", selection: colorBinding(\.primaryColorHex), supportsOpacity: false)
                 ColorPicker("project.color.bottom", selection: colorBinding(\.secondaryColorHex), supportsOpacity: false)
@@ -68,6 +87,15 @@ struct ProjectDetailView: View {
                 }
             }
         }
+        .task(id: project.appIconFilename) {
+            iconImage = project.appIconFilename
+                .flatMap { try? LocalFileStore.shared.load($0) }
+                .flatMap(UIImage.init(data:))
+        }
+        .onChange(of: iconItem) { _, item in
+            guard let item else { return }
+            Task { await importIcon(from: item) }
+        }
         .onChange(of: videoItem) { _, item in
             guard let item else { return }
             Task { await importVideo(from: item) }
@@ -88,6 +116,16 @@ struct ProjectDetailView: View {
             get: { Color(hex: project[keyPath: keyPath]) },
             set: { project[keyPath: keyPath] = $0.hexString }
         )
+    }
+
+    private func importIcon(from item: PhotosPickerItem) async {
+        defer { iconItem = nil }
+        let store = LocalFileStore.shared
+        guard let data = try? await item.loadTransferable(type: Data.self),
+              let image = UIImage(data: data),
+              let name = try? store.save(image.pngData() ?? data, fileExtension: "png") else { return }
+        if let old = project.appIconFilename { try? store.delete(old) }
+        project.appIconFilename = name
     }
 
     private var videos: [SourceAsset] { assets.filter { $0.kind == .video } }
