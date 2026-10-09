@@ -141,7 +141,7 @@ public enum SpecCatalog {
         playShot("gp.shot.tablet7", "7\" tabletti", sides: 320...3840, min: 0,
                  recommended: PixelSize(1080, 1920)),
         playShot("gp.shot.tablet10", "10\" tabletti", sides: 1080...7680, min: 0,
-                 recommended: PixelSize(1200, 1920)),
+                 recommended: PixelSize(1080, 1920)),
         playShot("gp.shot.desktop", "Työpöytä (Chromebook)", sides: 1080...7680, min: 4,
                  notes: "Vaaditaan vain jos sovellus tukee työpöytää",
                  recommended: PixelSize(1920, 1080)),

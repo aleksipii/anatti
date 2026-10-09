@@ -18,11 +18,15 @@ struct ProjectsView: View {
                 } else {
                     List {
                         ForEach(projects) { project in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(project.name).font(.headline)
-                                Text(String(format: String(localized: "project.created"), project.createdAt.formatted(date: .abbreviated, time: .omitted)))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                            NavigationLink {
+                                ProjectDetailView(project: project)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(project.name).font(.headline)
+                                    Text(String(format: String(localized: "project.created"), project.createdAt.formatted(date: .abbreviated, time: .omitted)))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .onDelete(perform: delete)
@@ -57,7 +61,7 @@ struct ProjectsView: View {
 
     private func delete(at offsets: IndexSet) {
         for index in offsets {
-            modelContext.delete(projects[index])
+            modelContext.deleteProject(projects[index])
         }
     }
 }

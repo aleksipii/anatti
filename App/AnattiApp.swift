@@ -6,7 +6,7 @@ import AnattiPro
 struct AnattiApp: App {
     /// Local-only store: no CloudKit, no App Group, data never leaves the device.
     private let container: ModelContainer = {
-        let schema = Schema([Project.self, SourceAsset.self])
+        let schema = Schema([Project.self, SourceAsset.self, Slide.self])
         let configuration = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
         do {
             return try ModelContainer(for: schema, configurations: [configuration])
