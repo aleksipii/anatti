@@ -12,6 +12,8 @@ struct ProjectDetailView: View {
     @State private var videoItem: PhotosPickerItem?
     @State private var importFailed = false
     @State private var iconItem: PhotosPickerItem?
+    @State private var screenshotItems: [PhotosPickerItem] = []
+    @State private var failedImports = 0
     @State private var iconImage: UIImage?
 
     init(project: Project) {
@@ -79,6 +81,14 @@ struct ProjectDetailView: View {
                         for index in offsets { modelContext.deleteSlide(slides[index]) }
                     }
                 }
+                PhotosPicker(selection: $screenshotItems, matching: .images, photoLibrary: .shared()) {
+                    Label("slide.import", systemImage: "photo.stack")
+                }
+                if failedImports > 0 {
+                    Label(String(format: String(localized: "slide.import.failed"), failedImports),
+                          systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                }
             }
 
             Section("project.videos") {
@@ -103,6 +113,10 @@ struct ProjectDetailView: View {
             iconImage = project.appIconFilename
                 .flatMap { try? LocalFileStore.shared.load($0) }
                 .flatMap(UIImage.init(data:))
+        }
+        .onChange(of: screenshotItems) { _, items in
+            guard !items.isEmpty else { return }
+            Task { await importScreenshots(items) }
         }
         .onChange(of: iconItem) { _, item in
             guard let item else { return }
@@ -141,6 +155,18 @@ struct ProjectDetailView: View {
             get: { Color(hex: project[keyPath: keyPath]) },
             set: { project[keyPath: keyPath] = $0.hexString }
         )
+    }
+
+    /// Loads every picked image in order, then creates the slides after the existing ones.
+    private func importScreenshots(_ items: [PhotosPickerItem]) async {
+        defer { screenshotItems = [] }
+        var images: [Data] = []
+        for item in items {
+            if let data = try? await item.loadTransferable(type: Data.self) { images.append(data) }
+        }
+        let imported = SlideImporter.importSlides(
+            images, project: project, startOrder: (slides.last?.order ?? -1) + 1, context: modelContext)
+        failedImports = items.count - imported
     }
 
     private func importIcon(from item: PhotosPickerItem) async {
